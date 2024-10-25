@@ -1,5 +1,6 @@
 import { createStore } from "https://cdn.skypack.dev/redux";
-import todosReducer from "./todosReducer.js"; // Ensure .js is specified
+import todosReducer from "./todosReducer.js";
+import { addTodo,removeTodo } from "./actions.js";
 
 const store = createStore(todosReducer);
 
@@ -9,23 +10,32 @@ store.subscribe(() => {
 });
 
 const todoInput = document.querySelector("#todoInput");
-const addTodo = document.querySelector("#addTodo");
+const addTodos = document.querySelector("#addTodo");
 const todoList = document.querySelector("#todoList");
 
 const addTodoHandler = () => {
-  const todoValue = todoInput.value.trim();
+  const todoValue = todoInput.value;
   if (todoValue) {
     console.log("TODO Value:", todoValue);
-    store.dispatch({ type: "ADD_TODO", payload: todoValue });
-    todoInput.value = ""; // Clear input field after adding
+    store.dispatch(addTodo(todoValue));
+    todoInput.value = "";
   }
 };
 
-addTodo.addEventListener("click", addTodoHandler);
+window.removeTodoHandler = (index) => {
+  store.dispatch(removeTodo(index));
+};
+
+addTodos.addEventListener("click", addTodoHandler);
 
 const updateTodoList = () => {
   const state = store.getState();
-  todoList.innerHTML = state.todos.map((todo) => `<li>${todo}</li>`).join("");
+  todoList.innerHTML = state.todos
+    .map(
+      (todo, index) =>
+        `<li>${todo} <button onClick="removeTodoHandler(${index})">Delete</button></li>`
+    )
+    .join("");
 };
 
 updateTodoList();
